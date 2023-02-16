@@ -3,7 +3,9 @@ package com.mycompany.paint;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Scanner;
 import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
 
 public class Paint {
 
@@ -15,7 +17,7 @@ public class Paint {
     }
 
     public static void filling(BufferedImage image, int x, int y,
-                               int origColor, int newColor) {
+            int origColor, int newColor) {
         if (x + 1 < image.getWidth() && image.getRGB(x + 1, y) == origColor) {
             image.setRGB(x + 1, y, newColor);
             filling(image, x + 1, y, origColor, newColor);
@@ -35,19 +37,33 @@ public class Paint {
     }
 
     public static void main(String[] args) {
-        String filepath = "C:\\Users\\user\\Desktop\\image.png";
         try {
-            BufferedImage img = ImageIO.read(new File(filepath));
-            int width = img.getWidth();
-            int height = img.getHeight();
-            System.out.println(width + " " + height);
-            int x = 65; //136
-            int y = 45; //90
-            int baseColor = img.getRGB(x, y);
-            int newColor = getIntFromColor(255, 255, 0);
-            img.setRGB(x, y, newColor);
-            filling(img, x, y, baseColor, newColor);
-            ImageIO.write(img, "png", new File(filepath));
+            JFileChooser filepath = new JFileChooser();
+            int path = filepath.showDialog(null, "File");
+            if (path == JFileChooser.APPROVE_OPTION) {
+                File file = filepath.getSelectedFile();
+                BufferedImage img = ImageIO.read(file);
+                int width = img.getWidth() - 1;
+                int height = img.getHeight() - 1;
+                System.out.println("Параметры изображения: " + width + "x" + height);
+                System.out.print("Введите x y: ");
+                Scanner input = new Scanner(System.in);
+                int x = input.nextInt();
+                int y = input.nextInt();
+                if (x <= width & y <= height) {
+                    int baseColor = img.getRGB(x, y);
+                    System.out.print("Введите r g b: ");
+                    int r = input.nextInt();
+                    int g = input.nextInt();
+                    int b = input.nextInt();
+                    int newColor = getIntFromColor(r, g, b);
+                    img.setRGB(x, y, newColor);
+                    filling(img, x, y, baseColor, newColor);
+                    ImageIO.write(img, "png", file);
+                } else {
+                    System.out.println("'x' or 'y' out of bounds");
+                }
+            }
         } catch (IOException e) {
             System.out.println("File is not found");
         }
